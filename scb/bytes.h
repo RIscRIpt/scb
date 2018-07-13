@@ -14,13 +14,9 @@ namespace scb {
             Hex,
         };
 
-        Bytes(size_t size = 0);
-        Bytes(Byte byte, size_t count);
+        using std::vector<Byte>::vector;
 
-        Bytes(Byte const *begin, Byte const *end);
-        Bytes(std::vector<Byte>::const_iterator begin, std::vector<Byte>::const_iterator end);
-        Bytes(std::initializer_list<Byte> list);
-
+        Bytes();
         Bytes(StringAs as, char const *string);
         Bytes(StringAs as, std::string const &string);
 
@@ -34,9 +30,13 @@ namespace scb {
 
     private:
         static Byte hex_char_to_nibble(char c);
+        static bool is_hex_char(char c);
 
         static std::vector<Byte> from_raw_string(char const *string);
         static std::vector<Byte> from_hex_string(char const *string);
     };
 
 }
+
+std::ostream& operator<<(std::ostream &os, scb::Bytes const &bytes);
+std::istream& operator>>(std::istream &is, scb::Bytes &bytes);
