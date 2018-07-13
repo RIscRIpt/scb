@@ -3,28 +3,32 @@
 using namespace scb;
 
 Bytes::Bytes(size_t size)
-    : bytes_(size, 0)
+    : std::vector<Byte>(size, 0)
 {}
 
-scb::Bytes::Bytes(Byte byte, size_t count)
-    : bytes_(count, byte)
+Bytes::Bytes(Byte byte, size_t count)
+    : std::vector<Byte>(count, byte)
 {}
 
-Bytes::Bytes(container const &bytes)
-    : bytes_(bytes)
+Bytes::Bytes(Byte const *begin, Byte const *end)
+    : std::vector<Byte>(begin, end)
 {}
 
-Bytes::Bytes(container &&bytes)
-    : bytes_(std::move(bytes))
+Bytes::Bytes(std::vector<Byte>::const_iterator begin, std::vector<Byte>::const_iterator end)
+    : std::vector<Byte>(begin, end)
+{}
+
+Bytes::Bytes(std::initializer_list<Byte> list)
+    : std::vector<Byte>(list.begin(), list.end())
 {}
 
 Bytes::Bytes(StringAs as, char const *string) {
     switch (as) {
         default:
-            bytes_ = from_raw_string(string);
+            std::vector<Byte>(from_raw_string(string));
             break;
         case Hex:
-            bytes_ = from_hex_string(string);
+            std::vector<Byte>(from_hex_string(string));
             break;
     }
 }
@@ -38,7 +42,7 @@ Bytes scb::Bytes::operator&(Bytes const &rhs) {
         throw std::runtime_error("sizes do not match");
     Bytes b(size());
     for (size_t i = 0; i < size(); i++)
-        b[i] = bytes_[i] & rhs[i];
+        b[i] = (*this)[i] & rhs[i];
     return b;
 }
 
@@ -47,7 +51,7 @@ Bytes scb::Bytes::operator|(Bytes const & rhs) {
         throw std::runtime_error("sizes do not match");
     Bytes b(size());
     for (size_t i = 0; i < size(); i++)
-        b[i] = bytes_[i] | rhs[i];
+        b[i] = (*this)[i] | rhs[i];
     return b;
 }
 
@@ -56,7 +60,7 @@ Bytes scb::Bytes::operator^(Bytes const & rhs) {
         throw std::runtime_error("sizes do not match");
     Bytes b(size());
     for (size_t i = 0; i < size(); i++)
-        b[i] = bytes_[i] ^ rhs[i];
+        b[i] = (*this)[i] ^ rhs[i];
     return b;
 }
 
@@ -64,7 +68,7 @@ Bytes& scb::Bytes::operator&=(Bytes const & rhs) {
     if (size() != rhs.size())
         throw std::runtime_error("sizes do not match");
     for (size_t i = 0; i < size(); i++)
-        bytes_[i] &= rhs[i];
+        (*this)[i] &= rhs[i];
     return *this;
 }
 
@@ -72,7 +76,7 @@ Bytes& scb::Bytes::operator|=(Bytes const & rhs) {
     if (size() != rhs.size())
         throw std::runtime_error("sizes do not match");
     for (size_t i = 0; i < size(); i++)
-        bytes_[i] |= rhs[i];
+        (*this)[i] |= rhs[i];
     return *this;
 }
 
@@ -80,7 +84,7 @@ Bytes & scb::Bytes::operator^=(Bytes const & rhs) {
     if (size() != rhs.size())
         throw std::runtime_error("sizes do not match");
     for (size_t i = 0; i < size(); i++)
-        bytes_[i] ^= rhs[i];
+        (*this)[i] ^= rhs[i];
     return *this;
 }
 
@@ -94,16 +98,16 @@ Byte scb::Bytes::hex_char_to_nibble(char c) {
     throw std::runtime_error("invalid hex character");
 }
 
-Bytes::container Bytes::from_raw_string(char const *string) {
-    return container(string, string + strlen(string));
+std::vector<Byte> Bytes::from_raw_string(char const *string) {
+    return std::vector<Byte>(string, string + strlen(string));
 }
 
-Bytes::container Bytes::from_hex_string(char const *string) {
+std::vector<Byte> Bytes::from_hex_string(char const *string) {
     size_t length = strlen(string);
     if (length & 1)
         throw std::runtime_error("invalid hex string");
 
-    container bytes(length / 2);
+    std::vector<Byte> bytes(length / 2);
 
     for (size_t i = 0; i < length; i += 2) {
         bytes[i / 2] = (
