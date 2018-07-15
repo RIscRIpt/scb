@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="bytes.h" />
+    <ClInclude Include="ByteStream.h" />
+    <ClInclude Include="Bytes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bytes.cpp" />
+    <ClCompile Include="ByteStream.cpp" />
+    <ClCompile Include="Bytes.cpp" />
   </ItemGroup>
 </Project>

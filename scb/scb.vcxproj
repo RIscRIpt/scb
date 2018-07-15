@@ -128,10 +128,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bytes.h" />
+    <ClInclude Include="Bytes.h" />
+    <ClInclude Include="ByteStream.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bytes.cpp" />
+    <ClCompile Include="Bytes.cpp" />
+    <ClCompile Include="ByteStream.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
