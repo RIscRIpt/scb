@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <iomanip>
 
 namespace scb {
 
@@ -18,11 +19,46 @@ namespace scb {
 
         Bytes();
         Bytes(char const *string, StringAs as = Hex);
+        Bytes(wchar_t const *string, StringAs as = Hex);
         Bytes(std::string const &string, StringAs as = Hex);
+        Bytes(std::wstring const &string, StringAs as = Hex);
         Bytes(std::initializer_list<Bytes> concat);
 
-        void dump(std::ostream &os) const;
-        void print(std::ostream &os, char const *separator = "") const;
+        template<typename Char>
+        void dump(std::basic_ostream<Char, std::char_traits<Char>> &os) const {
+            std::ios::fmtflags flags(os.flags());
+            os << std::hex << std::uppercase << std::setfill(Char('0'));
+
+            os << "      00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F       ASCII\r\n";
+            for (size_t i = 0; i < size(); i += 16) {
+                os << std::setw(4) << i << "  ";
+                for (size_t j = i; j < i + 16 && j < size(); j++) {
+                    os << std::setw(2) << static_cast<int>((*this)[j]) << ' ';
+                }
+                if (i + 16 > size()) {
+                    for (size_t j = size() % 16; j < 16; j++)
+                        os << "   ";
+                }
+                os << ' ';
+                for (size_t j = i; j < i + 16 && j < size(); j++) {
+                    os << to_dump_char((*this)[j]);
+                }
+                os << "\r\n";
+            }
+
+            os.flags(flags);
+        }
+
+        template<typename Char>
+        void print(std::basic_ostream<Char, std::char_traits<Char>> &os, Char const *separator = nullptr) const {
+            std::ios::fmtflags flags(os.flags());
+            os << std::hex << std::uppercase << std::setfill(Char('0'));
+            for (size_t i = 0; i < size() - 1; i++)
+                os << std::setw(2) << static_cast<int>((*this)[i]) << separator;
+            os << std::setw(2) << static_cast<int>(back());
+            os.flags(flags);
+        }
+
 
         Bytes bytes(size_t offset, size_t length) const;
         Bytes left(size_t length) const;
@@ -46,10 +82,41 @@ namespace scb {
     private:
         static char to_dump_char(char c);
         static Byte hex_char_to_nibble(char c);
-        static bool is_hex_char(char c);
+
+        template<typename Char>
+        static bool is_hex_char(Char c) {
+            return (c >= '0' && c <= '9')
+                || (c >= 'A' && c <= 'F')
+                || (c >= 'a' && c <= 'f');
+        }
 
         static std::vector<Byte> from_raw_string(char const *string);
-        static std::vector<Byte> from_hex_string(char const *string);
+        static std::vector<Byte> from_raw_string(wchar_t const *string);
+
+        template<typename Char>
+        std::vector<Byte> from_hex_string(Char const *string) {
+            std::vector<Byte> bytes;
+            size_t i = 0;
+            while (true) {
+                Char a = string[i];
+                if (!a)
+                    break;
+                i++;
+                if (!is_hex_char(a))
+                    continue;
+                Char b = string[i];
+                if (!is_hex_char(b))
+                    throw std::runtime_error("invalid hex string");
+                i++;
+                bytes.emplace_back(
+                    (hex_char_to_nibble(a) << 4) |
+                    (hex_char_to_nibble(b))
+                );
+            }
+
+            return bytes;
+        }
+
         static std::vector<Byte> from_list_of_bytes(std::initializer_list<Bytes> list);
     };
 
