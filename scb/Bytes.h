@@ -50,7 +50,7 @@ namespace scb {
         }
 
         template<typename Char>
-        void print(std::basic_ostream<Char, std::char_traits<Char>> &os, Char const *separator = nullptr) const {
+        void print(std::basic_ostream<Char, std::char_traits<Char>> &os, Char const *separator = L"") const {
             std::ios::fmtflags flags(os.flags());
             os << std::hex << std::uppercase << std::setfill(Char('0'));
             for (size_t i = 0; i < size() - 1; i++)

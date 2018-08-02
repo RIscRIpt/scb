@@ -128,7 +128,7 @@ Byte Bytes::hex_char_to_nibble(char c) {
     if (c >= 'A' && c <= 'F')
         return c - 'A' + 10;
     if (c >= 'a' && c <= 'f')
-        return c - 'f' + 10;
+        return c - 'a' + 10;
     throw std::runtime_error("invalid hex character");
 }
 
