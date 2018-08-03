@@ -109,8 +109,8 @@ namespace scb {
                     throw std::runtime_error("invalid hex string");
                 i++;
                 bytes.emplace_back(
-                    (hex_char_to_nibble(a) << 4) |
-                    (hex_char_to_nibble(b))
+                    (hex_char_to_nibble(static_cast<char>(a)) << 4) |
+                    (hex_char_to_nibble(static_cast<char>(b)))
                 );
             }
 

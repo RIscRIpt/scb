@@ -137,7 +137,7 @@ std::vector<Byte> Bytes::from_raw_string(char const *string) {
 }
 
 std::vector<Byte> Bytes::from_raw_string(wchar_t const *string) {
-    return std::vector<Byte>(string, string + wcslen(string));
+    return std::vector<Byte>(reinterpret_cast<char const*>(string), reinterpret_cast<char const*>(string + wcslen(string)));
 }
 
 std::vector<Byte> Bytes::from_list_of_bytes(std::initializer_list<Bytes> list) {
