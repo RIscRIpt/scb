@@ -57,6 +57,19 @@ Bytes& Bytes::join(Bytes const &bytes) {
     return *this;
 }
 
+bool Bytes::all_ascii() const noexcept {
+    for (auto c : *this)
+        if (!is_ascii_char(c))
+            return false;
+    return true;
+}
+
+char const* Bytes::ascii() {
+    push_back('\0');
+    pop_back();
+    return reinterpret_cast<char const*>(data());
+}
+
 Bytes Bytes::operator&(Bytes const &rhs) const {
     if (size() != rhs.size())
         throw std::runtime_error("sizes do not match");
@@ -116,10 +129,12 @@ Bytes& Bytes::operator+=(Bytes const &rhs) {
     return join(rhs);
 }
 
+bool Bytes::is_ascii_char(char c) {
+    return c >= ' ' && c <= '~';
+}
+
 char Bytes::to_dump_char(char c) {
-    if (c >= ' ' && c <= '~')
-        return c;
-    return '.';
+    return is_ascii_char(c) ? c : '.';
 }
 
 Byte Bytes::hex_char_to_nibble(char c) {

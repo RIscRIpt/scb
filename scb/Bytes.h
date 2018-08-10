@@ -59,13 +59,15 @@ namespace scb {
             os.flags(flags);
         }
 
-
         Bytes bytes(size_t offset, size_t length) const;
         Bytes left(size_t length) const;
         Bytes right(size_t length) const;
 
         Bytes concat(Bytes const &bytes) const;
         Bytes& join(Bytes const &bytes);
+
+        bool all_ascii() const noexcept;
+        char const* ascii();
 
         Bytes operator&(Bytes const &rhs) const;
         Bytes operator|(Bytes const &rhs) const;
@@ -80,6 +82,7 @@ namespace scb {
         Bytes& operator+=(Bytes const &rhs);
 
     private:
+        static bool is_ascii_char(char c);
         static char to_dump_char(char c);
         static Byte hex_char_to_nibble(char c);
 
