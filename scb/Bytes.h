@@ -51,12 +51,28 @@ namespace scb {
 
         template<typename Char>
         void print(std::basic_ostream<Char, std::char_traits<Char>> &os, Char const *separator = L"") const {
+            if (empty())
+                return;
             std::ios::fmtflags flags(os.flags());
             os << std::hex << std::uppercase << std::setfill(Char('0'));
             for (size_t i = 0; i < size() - 1; i++)
                 os << std::setw(2) << static_cast<int>((*this)[i]) << separator;
             os << std::setw(2) << static_cast<int>(back());
             os.flags(flags);
+        }
+
+        template<typename Char>
+        std::basic_string<Char> to_hex_string(Char const *separator = L"") const {
+            std::basic_stringstream<Char, std::char_traits<Char>> os;
+            print(os, separator);
+            return os.str();
+        }
+
+        template<typename Char>
+        std::basic_string<Char> to_hex_dump() const {
+            std::basic_stringstream<Char, std::char_traits<Char>> os;
+            dump(os);
+            return os.str();
         }
 
         Bytes bytes(size_t offset, size_t length) const;
