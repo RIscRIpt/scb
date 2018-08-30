@@ -10,12 +10,13 @@ Bytes::Bytes()
 
 Bytes::Bytes(char const *string, StringAs as)
     : std::vector<Byte>(as == Hex ? from_hex_string(string)
-                                  : from_raw_string(string))
+                                  : from_ascii_string(string))
 {}
 
 Bytes::Bytes(wchar_t const *string, StringAs as)
-    : std::vector<Byte>(as == Hex ? from_hex_string(string)
-                                  : from_raw_string(string))
+    : std::vector<Byte>(as == Hex     ? from_hex_string(string) :
+                        as == Unicode ? from_unicode_string(string) :
+                                        from_ascii_string(string))
 {}
 
 Bytes::Bytes(std::string const &string, StringAs as)
@@ -147,11 +148,18 @@ Byte Bytes::hex_char_to_nibble(char c) {
     throw std::runtime_error("invalid hex character");
 }
 
-std::vector<Byte> Bytes::from_raw_string(char const *string) {
+std::vector<Byte> Bytes::from_ascii_string(char const *string) {
     return std::vector<Byte>(string, string + strlen(string));
 }
 
-std::vector<Byte> Bytes::from_raw_string(wchar_t const *string) {
+std::vector<Byte> scb::Bytes::from_ascii_string(wchar_t const *string) {
+    std::vector<Byte> result(wcslen(string));
+    for (size_t i = 0; i < result.size(); i++)
+        result[i] = static_cast<Byte>(string[i]);
+    return result;
+}
+
+std::vector<Byte> Bytes::from_unicode_string(wchar_t const *string) {
     return std::vector<Byte>(reinterpret_cast<char const*>(string), reinterpret_cast<char const*>(string + wcslen(string)));
 }
 

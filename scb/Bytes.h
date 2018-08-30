@@ -11,8 +11,9 @@ namespace scb {
     class Bytes : public std::vector<Byte> {
     public:
         enum StringAs {
-            Raw,
             Hex,
+            ASCII,
+            Unicode,
         };
 
         using std::vector<Byte>::vector;
@@ -109,8 +110,9 @@ namespace scb {
                 || (c >= 'a' && c <= 'f');
         }
 
-        static std::vector<Byte> from_raw_string(char const *string);
-        static std::vector<Byte> from_raw_string(wchar_t const *string);
+        static std::vector<Byte> from_ascii_string(char const *string);
+        static std::vector<Byte> from_ascii_string(wchar_t const *string);
+        static std::vector<Byte> from_unicode_string(wchar_t const *string);
 
         template<typename Char>
         std::vector<Byte> from_hex_string(Char const *string) {
